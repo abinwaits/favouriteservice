@@ -3,18 +3,17 @@
  */
 package com.stackroute.favouriteservice.pubg.api.dto;
 
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author ubuntu
  *
  */
-public class TournamentData {
+public class IncludedData {
 	private String type;
 	private String id;
-	private Map<String,Map<String,List<Data>>> relationships;
-	
+	private MatchAttributes attributes;
+	 
 	public String getType() {
 		return type;
 	}
@@ -27,14 +26,13 @@ public class TournamentData {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	
-	public Map<String, Map<String, List<Data>>> getRelationships() {
-		return relationships;
+	public MatchAttributes getAttributes() {
+		return attributes;
 	}
-	public void setRelationships(Map<String, Map<String, List<Data>>> relationships) {
-		this.relationships = relationships;
+	public void setAttributes(MatchAttributes attributes) {
+		this.attributes = attributes;
 	}
+	
 	
 	
 }

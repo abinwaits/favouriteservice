@@ -12,7 +12,7 @@ import java.util.Map;
 public class IncludedData {
 	private String type;
 	private String id;
-	private MatchAttributes attributes;
+	private IncludedAttributes attributes;
 	 
 	public String getType() {
 		return type;
@@ -26,10 +26,10 @@ public class IncludedData {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public MatchAttributes getAttributes() {
+	public IncludedAttributes getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(MatchAttributes attributes) {
+	public void setAttributes(IncludedAttributes attributes) {
 		this.attributes = attributes;
 	}
 	

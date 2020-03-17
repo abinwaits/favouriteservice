@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.stackroute.favouriteservice.dto.MatchDetails;
 import com.stackroute.favouriteservice.dto.MatchResponse;
+import com.stackroute.favouriteservice.dto.ParticipantDetails;
 import com.stackroute.favouriteservice.dto.TournamentDetails;
 import com.stackroute.favouriteservice.dto.TournamentResponse;
 import com.stackroute.favouriteservice.facade.ServiceFacade;
 import com.stackroute.favouriteservice.pubg.api.dto.Data;
+import com.stackroute.favouriteservice.pubg.api.dto.IncludedAttributes;
+import com.stackroute.favouriteservice.pubg.api.dto.IncludedData;
 import com.stackroute.favouriteservice.pubg.api.dto.MatchData;
 import com.stackroute.favouriteservice.pubg.api.dto.PubgApiMatchResponse;
 import com.stackroute.favouriteservice.pubg.api.dto.PubgApiResponse;
@@ -37,7 +40,7 @@ public class PubgServiceImpl implements IPubgService {
 		if (pubgApiResponse != null) {
 			List<Data> dataList = pubgApiResponse.getData();
 			if (dataList != null && !dataList.isEmpty()) {
-				int i=0;
+				int i = 0;
 				for (Data data : dataList) {
 					tournamentDetails = new TournamentDetails();
 					tournamentDetails.setTournamentId(data.getId());
@@ -47,15 +50,15 @@ public class PubgServiceImpl implements IPubgService {
 						if (tournamentDataList != null && !tournamentDataList.isEmpty()) {
 							matchDetailsList = new ArrayList<MatchDetails>();
 							for (Data tData : tournamentDataList) {
-								matchDetailsList
-										.add(findMatchDetails(tournamentDetails.getTournamentId(), tData.getId()));
+								matchDetailsList.add(
+										findMatchDetails(tournamentDetails.getTournamentId(), tData.getId(), false));
 							}
 							tournamentDetails.setMatchDetails(matchDetailsList);
 						}
 					}
 					tournamentDetailsList.add(tournamentDetails);
 					++i;
-					if(i==5) {
+					if (i == 5) {
 						break;
 					}
 				}
@@ -69,12 +72,14 @@ public class PubgServiceImpl implements IPubgService {
 	public MatchResponse getMatchDetails(String tournamentId, String matchId) {
 		// TODO Auto-generated method stub
 		MatchResponse matchResponse = new MatchResponse();
-		matchResponse.setMatchDetails(findMatchDetails(tournamentId, matchId));
+		matchResponse.setMatchDetails(findMatchDetails(tournamentId, matchId, true));
 		return matchResponse;
 	}
 
-	private MatchDetails findMatchDetails(String tournamentId, String matchId) {
+	private MatchDetails findMatchDetails(String tournamentId, String matchId, boolean needParticipantDetails) {
 		MatchDetails matchDetails = null;
+		List<ParticipantDetails> participantDetailsList = null;
+		ParticipantDetails participantDetails = null;
 		PubgApiMatchResponse pubgApiMatchResponse = serviceFacade.getMatchDetails(matchId);
 		if (pubgApiMatchResponse != null) {
 			matchDetails = new MatchDetails();
@@ -102,6 +107,41 @@ public class PubgServiceImpl implements IPubgService {
 				}
 			}
 
+			if (needParticipantDetails) {
+				List<IncludedData> includedList = pubgApiMatchResponse.getIncluded();
+				if (includedList != null && !includedList.isEmpty()) {
+					participantDetailsList = new ArrayList<ParticipantDetails>();
+					for (IncludedData includedData : includedList) {
+						if (includedData.getType().equalsIgnoreCase("participant")) {
+							participantDetails = new ParticipantDetails();
+							IncludedAttributes attributes = includedData.getAttributes();
+							Map<String, Object> stats = attributes.getStats();
+							if (stats != null && stats.keySet() != null) {
+								if (stats.containsKey("name")) {
+									participantDetails.setName(String.valueOf(stats.get("name")));
+								}
+								if (stats.containsKey("deathType")) {
+									participantDetails.setDeathType(String.valueOf(stats.get("deathType")));
+								}
+								if (stats.containsKey("vehicleDestroys")) {
+									participantDetails.setVehicleDestroys(String.valueOf(stats.get("vehicleDestroys")));
+								}
+								if (stats.containsKey("weaponsAcquired")) {
+									participantDetails.setWeaponsAcquired(String.valueOf(stats.get("weaponsAcquired")));
+								}
+								if (stats.containsKey("winPlace")) {
+									participantDetails.setWinPlace(String.valueOf(stats.get("winPlace")));
+								}
+								if (stats.containsKey("killPlace")) {
+									participantDetails.setKillPlace(String.valueOf(stats.get("killPlace")));
+								}
+							}
+							participantDetailsList.add(participantDetails);
+						}
+					}
+				}
+				matchDetails.setParticipantDetails(participantDetailsList);
+			}
 		}
 		return matchDetails;
 	}

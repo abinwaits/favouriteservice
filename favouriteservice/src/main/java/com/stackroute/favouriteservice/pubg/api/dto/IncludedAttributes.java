@@ -9,7 +9,7 @@ import java.util.Map;
  * @author ubuntu
  *
  */
-public class MatchAttributes {
+public class IncludedAttributes {
 	private Map<String,Object> stats;
     private String actor; 
     private String won;

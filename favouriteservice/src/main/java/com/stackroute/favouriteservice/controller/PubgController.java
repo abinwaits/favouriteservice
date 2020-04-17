@@ -54,9 +54,9 @@ public class PubgController {
 		return pubgService.getTournamentDetails();
 	}
 
-	@GetMapping("/tournament/matches/{tournamentid}/{matchid}")
-	public MatchResponse getMatchDetails(@PathVariable String tournamentid, @PathVariable String matchid) {
-		return pubgService.getMatchDetails(tournamentid, matchid);
+	@GetMapping("/tournament/matches/{tournamentid}/{matchid}/{emailid}")
+	public MatchResponse getMatchDetails(@PathVariable String tournamentid, @PathVariable String matchid, @PathVariable String emailid) {
+		return pubgService.getMatchDetails(tournamentid, matchid, emailid);
 	}
 
 }

@@ -16,6 +16,6 @@ public interface IPubgService {
 
 	TournamentResponse getTournamentDetails();
 
-	MatchResponse getMatchDetails(String tournamentId,String matchId);
+	MatchResponse getMatchDetails(String tournamentId,String matchId, String emailId);
 
 }

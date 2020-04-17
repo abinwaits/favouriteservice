@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class MatchDetails {
 	
+	private String emailId;
 	private String tournamentId;
 	private String matchId;
 	private String titleId;
@@ -18,9 +19,22 @@ public class MatchDetails {
 	private String mapName;
 	private String isCustomMatch;
 	private String duration;
+	public Boolean isFavourite;
 	private List<ParticipantDetails> participantDetails;
 	
 	
+	public Boolean getIsFavourite() {
+		return isFavourite;
+	}
+	public void setIsFavourite(Boolean isFavourite) {
+		this.isFavourite = isFavourite;
+	}
+	public String getEmailId() {
+		return emailId;
+	}
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
 	public String getMatchId() {
 		return matchId;
 	}

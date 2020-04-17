@@ -20,6 +20,7 @@ import com.stackroute.favouriteservice.pubg.api.dto.MatchData;
 import com.stackroute.favouriteservice.pubg.api.dto.PubgApiMatchResponse;
 import com.stackroute.favouriteservice.pubg.api.dto.PubgApiResponse;
 import com.stackroute.favouriteservice.pubg.api.dto.PubgApiTDResponse;
+import com.stackroute.favouriteservice.service.IFavouriteService;
 import com.stackroute.favouriteservice.service.IPubgService;
 
 @Service
@@ -27,6 +28,9 @@ public class PubgServiceImpl implements IPubgService {
 
 	@Autowired
 	ServiceFacade serviceFacade;
+	
+	@Autowired
+	IFavouriteService favouriteService;
 
 	@Override
 	public TournamentResponse getTournamentDetails() {
@@ -49,9 +53,14 @@ public class PubgServiceImpl implements IPubgService {
 						List<Data> tournamentDataList = pubgApiTDResponse.getIncluded();
 						if (tournamentDataList != null && !tournamentDataList.isEmpty()) {
 							matchDetailsList = new ArrayList<MatchDetails>();
+							int j=0;
 							for (Data tData : tournamentDataList) {
 								matchDetailsList.add(
-										findMatchDetails(tournamentDetails.getTournamentId(), tData.getId(), false));
+										findMatchDetails(tournamentDetails.getTournamentId(), tData.getId(), false, "NA"));
+								++j;
+								if(j==5) {
+									break;
+								}
 							}
 							tournamentDetails.setMatchDetails(matchDetailsList);
 						}
@@ -69,14 +78,14 @@ public class PubgServiceImpl implements IPubgService {
 	}
 
 	@Override
-	public MatchResponse getMatchDetails(String tournamentId, String matchId) {
+	public MatchResponse getMatchDetails(String tournamentId, String matchId, String emailId) {
 		// TODO Auto-generated method stub
 		MatchResponse matchResponse = new MatchResponse();
-		matchResponse.setMatchDetails(findMatchDetails(tournamentId, matchId, true));
+		matchResponse.setMatchDetails(findMatchDetails(tournamentId, matchId, true, emailId));
 		return matchResponse;
 	}
 
-	private MatchDetails findMatchDetails(String tournamentId, String matchId, boolean needParticipantDetails) {
+	private MatchDetails findMatchDetails(String tournamentId, String matchId, boolean needParticipantDetails, String emailId) {
 		MatchDetails matchDetails = null;
 		List<ParticipantDetails> participantDetailsList = null;
 		ParticipantDetails participantDetails = null;
@@ -108,6 +117,7 @@ public class PubgServiceImpl implements IPubgService {
 			}
 
 			if (needParticipantDetails) {
+				matchDetails.setIsFavourite(favouriteService.isMatchExists(emailId, matchId));
 				List<IncludedData> includedList = pubgApiMatchResponse.getIncluded();
 				if (includedList != null && !includedList.isEmpty()) {
 					participantDetailsList = new ArrayList<ParticipantDetails>();

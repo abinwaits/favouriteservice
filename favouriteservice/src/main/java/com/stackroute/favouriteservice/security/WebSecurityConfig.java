@@ -50,10 +50,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		// We don't need CSRF for this example
 		httpSecurity.csrf().disable()
 				// dont authenticate this particular request
-				.authorizeRequests().antMatchers("/authenticate/*/*").permitAll().
+				.authorizeRequests()
+				.antMatchers("/authenticate/*/*", "/swagger-ui.html", "/swagger-ui.html/*.*", "/swagger-ui.html*.*","/v2/api-docs",
+						"/configuration/ui", "/swagger-resources/**", "/configuration/security", "/swagger-ui.html",
+						"/webjars/**")
+				.permitAll().
 				// all other requests need to be authenticated
 				anyRequest().authenticated().and().
 				// make sure we use stateless session; session won't be used to

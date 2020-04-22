@@ -14,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -53,9 +56,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.csrf().disable()
 				// dont authenticate this particular request
 				.authorizeRequests()
-				.antMatchers("/authenticate/*/*", "/swagger-ui.html", "/swagger-ui.html/*.*", "/swagger-ui.html*.*","/v2/api-docs",
-						"/configuration/ui", "/swagger-resources/**", "/configuration/security", "/swagger-ui.html",
-						"/webjars/**")
+				.antMatchers("/authenticate/*/*", "/swagger-ui.html", "/swagger-ui.html/*.*", "/swagger-ui.html*.*",
+						"/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/security",
+						"/swagger-ui.html", "/webjars/**")
 				.permitAll().
 				// all other requests need to be authenticated
 				anyRequest().authenticated().and().
@@ -66,5 +69,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Add a filter to validate the tokens with every request
 		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+	}
+
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+		return source;
 	}
 }

@@ -1,5 +1,7 @@
 package com.stackroute.favouriteservice.security;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,29 +54,35 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		httpSecurity.csrf().disable()
-				// dont authenticate this particular request
-				.authorizeRequests()
-				.antMatchers("/authenticate/*/*", "/swagger-ui.html", "/swagger-ui.html/*.*", "/swagger-ui.html*.*",
-						"/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/security",
-						"/swagger-ui.html", "/webjars/**")
-				.permitAll().
-				// all other requests need to be authenticated
-				anyRequest().authenticated().and().
-				// make sure we use stateless session; session won't be used to
-				// store user's state.
-				exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.cors();
+        httpSecurity.csrf().disable()
+                // dont authenticate this particular request
+                .authorizeRequests()
+                .antMatchers("/authenticate/*/*", "/swagger-ui.html", "/swagger-ui.html/*.*", "/swagger-ui.html*.*",
+                        "/v2/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/security",
+                        "/swagger-ui.html", "/webjars/**")
+                .permitAll().
+                // all other requests need to be authenticated
+                anyRequest().authenticated().and().
+                // make sure we use stateless session; session won't be used to
+                // store user's state.
+                exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-		// Add a filter to validate the tokens with every request
-		httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-	}
+        // Add a filter to validate the tokens with every request
+        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    }
 
-	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
-		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
-		return source;
-	}
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

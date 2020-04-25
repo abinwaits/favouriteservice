@@ -33,7 +33,7 @@ public class FavouriteController {
 	}
 	
 	@DeleteMapping("/favouritematch/{emailid}/{matchid}")
-	public ApiResponse getFavouriteMatches(@PathVariable String emailid,@PathVariable String matchid){
+	public ApiResponse deleteFavouriteMatches(@PathVariable String emailid,@PathVariable String matchid){
 		return favouriteService.deleteFavouriteMatch(emailid,matchid);
 	}
 	

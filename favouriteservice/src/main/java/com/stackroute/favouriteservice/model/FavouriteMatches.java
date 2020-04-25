@@ -37,6 +37,10 @@ public class FavouriteMatches implements Serializable {
 	public FavouriteMatches() {
 
 	}
+	
+	public FavouriteMatches(FavouriteMatchesPK favouriteMatchesPK) {
+		this.favouriteMatchesPK=favouriteMatchesPK;
+	}
 
 	public FavouriteMatches(FavouriteMatchesPK favouriteMatchesPK, String tournamentId, String titleId, String gameMode,
 			String mapName, String duration) {

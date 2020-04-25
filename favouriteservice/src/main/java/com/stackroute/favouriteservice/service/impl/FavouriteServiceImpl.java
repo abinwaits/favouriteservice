@@ -83,8 +83,10 @@ public class FavouriteServiceImpl implements IFavouriteService {
 	public ApiResponse deleteFavouriteMatch(String emailId, String matchId) {
 		// TODO Auto-generated method stub
 		ApiResponse apiResponse = new ApiResponse();
+
 		FavouriteMatchesPK favouriteMatchesPK = new FavouriteMatchesPK(emailId, matchId);
-		favouriteMatchesDAO.deleteById(favouriteMatchesPK);
+		FavouriteMatches favouriteMatches = new FavouriteMatches(favouriteMatchesPK);
+		favouriteMatchesDAO.delete(favouriteMatches);
 		apiResponse.setMessage("Match is deleted successfully");
 		apiResponse.setHttpStatus(HttpStatus.OK.value());
 		return apiResponse;

@@ -1,6 +1,7 @@
 package com.stackroute.favouriteservice.service.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,9 +29,11 @@ public class PubgServiceImpl implements IPubgService {
 
 	@Autowired
 	ServiceFacade serviceFacade;
-	
+
 	@Autowired
 	IFavouriteService favouriteService;
+
+	private static Map<String, Object> cacheMap = new HashMap<String, Object>();
 
 	@Override
 	public TournamentResponse getTournamentDetails() {
@@ -40,6 +43,19 @@ public class PubgServiceImpl implements IPubgService {
 		TournamentDetails tournamentDetails = null;
 		PubgApiTDResponse pubgApiTDResponse = null;
 		List<MatchDetails> matchDetailsList = null;
+		if (cacheMap != null && cacheMap.keySet() != null && cacheMap.containsKey("TournamentResponse")
+				&& cacheMap.containsKey("Time")) {
+			long cachedTime = (long) cacheMap.get("Time");
+			long currentTime = System.currentTimeMillis();
+			long diff = (currentTime - cachedTime) / 90000;
+			if (diff <= 1.5) {
+				tournamentResponse = (TournamentResponse) cacheMap.get("TournamentResponse");
+				return tournamentResponse;
+			} else {
+				cacheMap.clear();
+			}
+
+		}
 		PubgApiResponse pubgApiResponse = serviceFacade.getTournaments();
 		if (pubgApiResponse != null) {
 			List<Data> dataList = pubgApiResponse.getData();
@@ -53,12 +69,12 @@ public class PubgServiceImpl implements IPubgService {
 						List<Data> tournamentDataList = pubgApiTDResponse.getIncluded();
 						if (tournamentDataList != null && !tournamentDataList.isEmpty()) {
 							matchDetailsList = new ArrayList<MatchDetails>();
-							int j=0;
+							int j = 0;
 							for (Data tData : tournamentDataList) {
-								matchDetailsList.add(
-										findMatchDetails(tournamentDetails.getTournamentId(), tData.getId(), false, "NA"));
+								matchDetailsList.add(findMatchDetails(tournamentDetails.getTournamentId(),
+										tData.getId(), false, "NA"));
 								++j;
-								if(j==5) {
+								if (j == 5) {
 									break;
 								}
 							}
@@ -74,6 +90,8 @@ public class PubgServiceImpl implements IPubgService {
 				tournamentResponse.setTournamentDetails(tournamentDetailsList);
 			}
 		}
+		cacheMap.put("TournamentResponse", tournamentResponse);
+		cacheMap.put("Time", System.currentTimeMillis());
 		return tournamentResponse;
 	}
 
@@ -85,7 +103,8 @@ public class PubgServiceImpl implements IPubgService {
 		return matchResponse;
 	}
 
-	private MatchDetails findMatchDetails(String tournamentId, String matchId, boolean needParticipantDetails, String emailId) {
+	private MatchDetails findMatchDetails(String tournamentId, String matchId, boolean needParticipantDetails,
+			String emailId) {
 		MatchDetails matchDetails = null;
 		List<ParticipantDetails> participantDetailsList = null;
 		ParticipantDetails participantDetails = null;
